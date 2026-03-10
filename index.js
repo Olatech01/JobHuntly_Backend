@@ -41,7 +41,7 @@ app.use('/uploads', express.static(uploadsPath));
 // CORS - Update this when you have backend domain
 app.use(cors({
     origin: [
-        'https://job-huntly-three.vercel.app/',
+        'https://job-huntly-three.vercel.app',
         'http://localhost:3000',
     ],
     credentials: true
