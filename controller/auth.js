@@ -148,6 +148,9 @@ const changePassword = async (req, res) => {
             return res.status(404).json({ error: "Invalid credentials" });
         }
 
+        if(newPasswod === oldPassword){
+            return res.status(400).json({ error: "New password cannot be the same as the old password" });
+        }
         const isMatch = await bcrypt.compare(oldPassword, user.password);
         if (!isMatch) {
             return res.status(400).json({ error: "Invalid credentials" });
