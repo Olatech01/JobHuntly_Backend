@@ -94,9 +94,11 @@ const login = async (req, res) => {
         if (!user) {
             return res.status(404).json({ error: "User not found" });
         }
+
         if (user.isBlocked) {
             return res.status(403).json({ error: "Your account has been blocked by the admin." });
         }
+
         if (user.isSuspended) {
             if (user.suspensionEndDate && user.suspensionEndDate > Date.now()) {
                 const formattedDate = new Date(user.suspensionEndDate).toLocaleString();
@@ -109,21 +111,27 @@ const login = async (req, res) => {
                 await user.save();
             }
         }
+
         const isMatch = await bcrypt.compare(password, user.password);
+
         if (!isMatch) {
             return res.status(400).json({
                 statusCode: "00",
                 error: "Invalid credentials"
             });
         }
+
         const token = jwt.sign({ id: user._id }, jwtSecret, { expiresIn: '5h' });
 
         user.lastLogin = new Date();
         await user.save();
 
+        // 🔐 remove password before sending response
+        const { password: _, ...userWithoutPassword } = user._doc;
+
         return res.json({
             msg: "Logged in successfully",
-            user,
+            user: userWithoutPassword,
             token
         });
 
@@ -148,7 +156,7 @@ const changePassword = async (req, res) => {
             return res.status(404).json({ error: "Invalid credentials" });
         }
 
-        if(newPassword === oldPassword){
+        if (newPassword === oldPassword) {
             return res.status(400).json({ error: "New password cannot be the same as the old password" });
         }
         const isMatch = await bcrypt.compare(oldPassword, user.password);
