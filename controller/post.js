@@ -108,4 +108,28 @@ const allJobs = async (req, res) => {
 
 }
 
-module.exports = { createJob, allJobs };
+const getJobById = async (req, res) => {
+    try {
+        const jobId = req.params.id;
+        const job = await JobPost.findById(jobId)
+            .populate({
+                 path: 'company',
+                select: 'companyLogo companyName website location', 
+            })
+            .exec();
+
+        if (!job) {
+            return res.status(404).json({ message: "Job not found" });
+        }
+
+        res.status(200).json({
+            message: "Job retrieved successfully",
+            job
+        });
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};
+
+
+module.exports = { createJob, allJobs, getJobById };
