@@ -42,29 +42,36 @@ const register = async (req, res) => {
             userType
         });
 
-        let profile;
+        await newUser.save();
 
-        // Create profile based on user type
+
         if (userType === "jobSeeker") {
 
-            profile = await UserProfile.create({
+            const profile = new UserProfile({
                 user: newUser._id,
                 fullName,
                 email
             });
 
-        } else if (userType === "company") {
+            await profile.save();
 
-            profile = await Company.create({
+            newUser.profile = profile._id;
+            await newUser.save();
+
+        }
+
+        if (userType === "company") {
+
+            const company = new Company({
                 user: newUser._id,
                 companyName: fullName
             });
 
-        }
+            await company.save();
 
-        // Link profile to user
-        newUser.profile = profile._id;
-        await newUser.save();
+            newUser.company = company._id;
+            await newUser.save();
+        }
 
         return res.status(201).json({
             success: true,

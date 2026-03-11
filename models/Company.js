@@ -10,7 +10,10 @@ const companySchema = new Schema({
         unique: true
     },
     companyName: String,
-    companyLogo: String,
+    companyLogo: {
+        type: String,
+        default: ""
+    },
     website: String,
     industry: String,
     companySize: String,
@@ -19,6 +22,6 @@ const companySchema = new Schema({
 })
 
 
-module.exports = model("Compnay", companySchema);
+module.exports = model("Company", companySchema);
 
 

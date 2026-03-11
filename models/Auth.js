@@ -32,10 +32,6 @@ const userSchema = new Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: "Job"
     }],
-    // isBlocked: {
-    //     type: Boolean,
-    //     default: false
-    // },
     isSuspended: {
         type: Boolean,
         default: false
@@ -47,6 +43,10 @@ const userSchema = new Schema({
     profile: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Profile'
+    },
+    company: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Company'
     },
     createdAt: {
         type: Date,

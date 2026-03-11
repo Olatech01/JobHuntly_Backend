@@ -1,9 +1,33 @@
-// const JobPost = require("../models/jobPost");
-
-const JobPost = require("../models/JobPost");
+const Company = require("../models/Company");
+const JobPost = require("../models/jobPost");
 
 const createJob = async (req, res) => {
     try {
+
+
+
+        const user = req.user;
+
+        if (!user) {
+            return res.status(401).json({ message: "Not authenticated" });
+        }
+
+        if (user.userType !== 'company') {
+            return res.status(403).json({
+                message: "Only company accounts can post jobs"
+            });
+        }
+
+
+        const companyDoc = await Company.findOne({ user: user._id });
+
+        if (!companyDoc) {
+            return res.status(400).json({
+                message: "Company profile not found. Please complete your company profile first."
+            });
+        }
+
+
         const {
             jobTitle,
             employmentType,
@@ -17,6 +41,9 @@ const createJob = async (req, res) => {
             perksAndBenefits
         } = req.body;
 
+
+
+
         const job = await JobPost.create({
             jobTitle,
             employmentType,
@@ -26,14 +53,21 @@ const createJob = async (req, res) => {
             jobDescriptions,
             responsibilities,
             whoYouAre,
+            company: companyDoc._id,
             niceToHaves,
             perksAndBenefits
         });
 
+        const populated = await JobPost.findById(job._id)
+            .populate({
+                path: 'company',
+                select: 'companyName companyLogo website location'
+            });
+
         res.status(201).json({
             status: "success",
             message: "Job created successfully",
-            data: job
+            data: populated || job
         });
 
     } catch (error) {
@@ -45,20 +79,43 @@ const createJob = async (req, res) => {
 };
 
 
+
 const allJobs = async (req, res) => {
     try {
+        const page = parseInt(req.query.page) || 1;
+        const limit = parseInt(req.query.limit) || 10;
+        const skip = (page - 1) * limit;
+
         const jobs = await JobPost.find()
-        // .populate('creator', 'username email profilePicture')
-        // .populate('inviteMembers', 'username email profilePicture')
-        // .sort({ createdAt: -1 });
+            .populate({
+                path: 'company',
+                select: 'companyLogo companyName',  // make sure these fields exist in User model
+            })
+            .sort({ createdAt: -1 })
+            .skip(skip)
+            .limit(limit);
+
+        // Debug: see what's actually coming back
+        console.log("First job's company (raw):", jobs[0]?.company);
+
+        const totalJobs = await JobPost.countDocuments();
 
         res.status(200).json({
-            message: "Jobs retrived successfully",
+            message: "Jobs retrieved successfully",
+            currentPage: page,
+            totalPages: Math.ceil(totalJobs / limit),
+            totalJobs,
+            debug: {
+                populatedCompanyExample: jobs[0]?.company || "not populated",
+                firstJobId: jobs[0]?._id
+            },
             jobs
         });
     } catch (error) {
+        console.error(error);
         res.status(500).json({ error: error.message });
     }
+
 }
 
 module.exports = { createJob, allJobs };

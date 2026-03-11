@@ -49,7 +49,8 @@ const jobPost = new Schema({
     },
     company: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: "User"
+        ref: "Company",          // ← change from "User" to "Company"
+        required: true           // ← strongly recommended for job posts
     },
     location: String,
     experienceLevel: String,
@@ -62,4 +63,4 @@ const jobPost = new Schema({
 
 }, { timestamps: true });
 
-module.exports = model("JobPost", jobPost);
+module.exports = model("jobPosts", jobPost);

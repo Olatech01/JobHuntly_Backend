@@ -14,6 +14,10 @@ const profileSchema = new Schema({
     location: String,
     skills: [String],
     resume: String,
+    profilePicture: {
+        type: String,
+        default: ""
+    },
     experienceLevel: {
         type: String,
         enum: ['entry', 'mid', 'senior', 'executive'],
