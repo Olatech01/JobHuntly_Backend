@@ -87,7 +87,7 @@ const allJobs = async (req, res) => {
             .skip(skip)
             .limit(limit);
 
-        console.log("First job's company (raw):", jobs[0]?.company);
+        // console.log("First job's company (raw):", jobs[0]?.company);
 
         const totalJobs = await JobPost.countDocuments();
 
@@ -96,10 +96,10 @@ const allJobs = async (req, res) => {
             currentPage: page,
             totalPages: Math.ceil(totalJobs / limit),
             totalJobs,
-            debug: {
-                populatedCompanyExample: jobs[0]?.company || "not populated",
-                firstJobId: jobs[0]?._id
-            },
+            // debug: {
+            //     populatedCompanyExample: jobs[0]?.company || "not populated",
+            //     firstJobId: jobs[0]?._id
+            // },
             jobs
         });
     } catch (error) {
