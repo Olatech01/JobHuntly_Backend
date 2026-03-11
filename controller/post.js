@@ -1,6 +1,22 @@
 const Company = require("../models/Company");
 const JobPost = require("../models/JobPost");
 
+
+
+const getFullUrl = (req, relativePath) => {
+    if (!relativePath) return null; // or a default placeholder
+
+    const protocol = req.get("x-forwarded-proto") || req.protocol; // handles https behind proxy
+    const host = req.get("host"); // includes port if present (localhost:5000)
+
+    // Remove leading slash if present, then add /
+    const cleanPath = relativePath.startsWith("/") ? relativePath : `/${relativePath}`;
+
+    return `${protocol}://${host}${cleanPath}`;
+};
+
+
+
 const createJob = async (req, res) => {
     try {
         const user = req.user;
@@ -50,11 +66,22 @@ const createJob = async (req, res) => {
             perksAndBenefits
         });
 
+
+
+
         const populated = await JobPost.findById(job._id)
             .populate({
                 path: 'company',
                 select: 'companyName companyLogo website location'
             });
+
+
+        if (populated && populated.company && populated.company.companyLogo) {
+            populated.company.companyLogo = getFullUrl(
+                req,
+                populated.company.companyLogo
+            );
+        }
 
         res.status(201).json({
             status: "success",
@@ -80,14 +107,23 @@ const allJobs = async (req, res) => {
 
         const jobs = await JobPost.find()
             .populate({
-                path: 'company',
-                select: 'companyLogo companyName website location', 
+                path: "company",
+                select: "companyName companyLogo website location",
             })
             .sort({ createdAt: -1 })
             .skip(skip)
             .limit(limit);
 
-        // console.log("First job's company (raw):", jobs[0]?.company);
+        // Transform EVERY job's companyLogo to full URL
+        const enhancedJobs = jobs.map((job) => {
+            const jobObj = job.toObject(); // convert to plain JS object (safer for mutation)
+
+            if (jobObj.company && jobObj.company.companyLogo) {
+                jobObj.company.companyLogo = getFullUrl(req, jobObj.company.companyLogo);
+            }
+
+            return jobObj;
+        });
 
         const totalJobs = await JobPost.countDocuments();
 
@@ -96,17 +132,12 @@ const allJobs = async (req, res) => {
             currentPage: page,
             totalPages: Math.ceil(totalJobs / limit),
             totalJobs,
-            // debug: {
-            //     populatedCompanyExample: jobs[0]?.company || "not populated",
-            //     firstJobId: jobs[0]?._id
-            // },
-            jobs
+            jobs: enhancedJobs,
         });
     } catch (error) {
         console.error(error);
         res.status(500).json({ error: error.message });
     }
-
-}
+};
 
 module.exports = { createJob, allJobs };
