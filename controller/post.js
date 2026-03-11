@@ -1,23 +1,17 @@
 const Company = require("../models/Company");
-const JobPost = require("../models/jobPost");
+const JobPost = require("../models/JobPost");
 
 const createJob = async (req, res) => {
     try {
-
-
-
         const user = req.user;
-
         if (!user) {
             return res.status(401).json({ message: "Not authenticated" });
         }
-
         if (user.userType !== 'company') {
             return res.status(403).json({
                 message: "Only company accounts can post jobs"
             });
         }
-
 
         const companyDoc = await Company.findOne({ user: user._id });
 
@@ -26,7 +20,6 @@ const createJob = async (req, res) => {
                 message: "Company profile not found. Please complete your company profile first."
             });
         }
-
 
         const {
             jobTitle,
@@ -40,7 +33,6 @@ const createJob = async (req, res) => {
             niceToHaves,
             perksAndBenefits
         } = req.body;
-
 
 
 
@@ -89,13 +81,12 @@ const allJobs = async (req, res) => {
         const jobs = await JobPost.find()
             .populate({
                 path: 'company',
-                select: 'companyLogo companyName',  // make sure these fields exist in User model
+                select: 'companyLogo companyName website location', 
             })
             .sort({ createdAt: -1 })
             .skip(skip)
             .limit(limit);
 
-        // Debug: see what's actually coming back
         console.log("First job's company (raw):", jobs[0]?.company);
 
         const totalJobs = await JobPost.countDocuments();
