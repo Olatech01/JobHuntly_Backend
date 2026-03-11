@@ -18,8 +18,12 @@ const jobPost = new Schema({
         type: String,
         required: true
     },
-
-    // ARRAY
+    deadline: {
+        type: Date,
+    },
+    capacity: {
+        type: Number,
+    },
     skills: {
         type: [String],
         required: true
@@ -49,8 +53,8 @@ const jobPost = new Schema({
     },
     company: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: "Company",          // ← change from "User" to "Company"
-        required: true           // ← strongly recommended for job posts
+        ref: "Company",         
+        required: true           
     },
     location: String,
     experienceLevel: String,
