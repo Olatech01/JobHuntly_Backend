@@ -1,7 +1,6 @@
 const mongoose = require('mongoose');
 const { Schema, model } = mongoose;
 
-
 const companySchema = new Schema({
     user: {
         type: mongoose.Schema.Types.ObjectId,
@@ -15,7 +14,7 @@ const companySchema = new Schema({
         default: ""
     },
     companyLogoPublicId: {
-        type: String, 
+        type: String,
     },
     website: String,
     industry: String,
@@ -25,16 +24,7 @@ const companySchema = new Schema({
 })
 
 
-companySchema.virtual("companyLogoUrl").get(function () {
-    if (!this.companyLogo) return null;
-
-    return `${process.env.BASE_URL || "http://localhost:6060"}${this.companyLogo.startsWith("/") ? "" : "/"}${this.companyLogo}`;
-});
-
 companySchema.set("toJSON", { virtuals: true });
 companySchema.set("toObject", { virtuals: true });
 
-
 module.exports = model("Company", companySchema);
-
-
