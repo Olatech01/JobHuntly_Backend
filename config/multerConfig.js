@@ -48,6 +48,7 @@
 const multer = require("multer");
 const { CloudinaryStorage } = require("multer-storage-cloudinary");
 const cloudinary = require("cloudinary").v2;
+const path = require("path");
 
 // Configure Cloudinary
 cloudinary.config({
@@ -60,7 +61,7 @@ cloudinary.config({
 const storage = new CloudinaryStorage({
     cloudinary,
     params: {
-        folder: "your-app-name/uploads", // folder name in your Cloudinary account
+        folder: "jobhuntly/uploads", // folder name in your Cloudinary account
         allowed_formats: ["jpeg", "jpg", "png", "webp"],
         transformation: [{ width: 500, height: 500, crop: "limit" }], // optional: resize on upload
     },
