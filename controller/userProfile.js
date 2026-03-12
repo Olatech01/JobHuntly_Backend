@@ -1,3 +1,4 @@
+const { cloudinary } = require("../config/multerConfig");
 const userModel = require("../models/Auth");
 const Company = require("../models/Company");
 const UserProfile = require("../models/UserProfile");
@@ -85,6 +86,8 @@ const getCompanyProfile = async (req, res) => {
 }
 
 
+// const { cloudinary } = require("../config/upload"); // adjust path if needed
+
 const updateCompanyProfile = async (req, res) => {
     try {
         const userId = req.user._id;
@@ -97,14 +100,15 @@ const updateCompanyProfile = async (req, res) => {
             companySize,
             location,
             description
-        } = req.body
+        } = req.body;
 
         let companyLogo;
+        let companyLogoPublicId;
 
         if (req.file) {
-            companyLogo = `/uploads/${req.file.filename}`;
+            companyLogo = req.file.path;           // full Cloudinary https:// URL
+            companyLogoPublicId = req.file.filename; // public_id for deletion later
         }
-
 
         const allowedFields = {
             fullName,
@@ -115,9 +119,11 @@ const updateCompanyProfile = async (req, res) => {
             companySize,
             location,
             companyLogo,
+            companyLogoPublicId,
             description,
         };
 
+        // Remove undefined fields
         Object.keys(allowedFields).forEach(
             key => allowedFields[key] === undefined && delete allowedFields[key]
         );
@@ -125,7 +131,6 @@ const updateCompanyProfile = async (req, res) => {
         let companyProfile = await Company.findOne({ user: userId });
 
         if (!companyProfile) {
-
             companyProfile = await Company.create({
                 user: userId,
                 ...allowedFields
@@ -136,6 +141,10 @@ const updateCompanyProfile = async (req, res) => {
             });
 
         } else {
+            // Delete old logo from Cloudinary before updating
+            if (req.file && companyProfile.companyLogoPublicId) {
+                await cloudinary.uploader.destroy(companyProfile.companyLogoPublicId);
+            }
 
             companyProfile = await Company.findOneAndUpdate(
                 { user: userId },
@@ -150,15 +159,13 @@ const updateCompanyProfile = async (req, res) => {
             data: companyProfile
         });
 
-
     } catch (error) {
         res.status(500).json({
             message: "Server error",
             error: error.message
         });
     }
-
-}
+};
 
 // PUT /api/profile
 const updateProfile = async (req, res) => {
