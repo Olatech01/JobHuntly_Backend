@@ -88,7 +88,7 @@ const allJobs = async (req, res) => {
         const jobs = await JobPost.find()
             .populate({
                 path: 'company',
-                select: 'companyLogo companyName website location', 
+                select: 'companyLogo companyName website location industry',
             })
             .sort({ createdAt: -1 })
             .skip(skip)
@@ -115,8 +115,8 @@ const getJobById = async (req, res) => {
         const jobId = req.params.id;
         const job = await JobPost.findById(jobId)
             .populate({
-                 path: 'company',
-                select: 'companyLogo companyName website location', 
+                path: 'company',
+                select: 'companyLogo companyName website location',
             })
             .exec();
 
@@ -132,6 +132,12 @@ const getJobById = async (req, res) => {
         res.status(500).json({ message: error.message });
     }
 };
+
+
+
+const jobsByCompany = async (req, res) => {
+
+}
 
 
 module.exports = { createJob, allJobs, getJobById };

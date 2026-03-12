@@ -9,6 +9,7 @@ const path = require('path');
 const connectDB = require('./connectDb/connect')
 const authRoutes = require('./routes/authRoutes');
 const jobRoutes = require('./routes/jobRoutes')
+const companyRoutes = require('./routes/companyRoutes')
 
 const app = express();
 
@@ -47,6 +48,7 @@ app.use(cors({
 // app.use("/api", require("./routes/handler"));
 app.use("/api/auth", authRoutes);
 app.use("/api", jobRoutes);
+app.use("/api", companyRoutes);
 
 const PORT = process.env.PORT || 6060;
 
