@@ -62,14 +62,14 @@ const storage = new CloudinaryStorage({
     cloudinary,
     params: {
         folder: "jobhuntly/uploads", // folder name in your Cloudinary account
-        allowed_formats: ["jpeg", "jpg", "png", "webp"],
+        allowed_formats: ["jpeg", "jpg", "png", "webp", "pdf"],
         transformation: [{ width: 500, height: 500, crop: "limit" }], // optional: resize on upload
     },
 });
 
 // File filter (same as before)
 const fileFilter = (req, file, cb) => {
-    const allowedTypes = /jpeg|jpg|png|webp/;
+    const allowedTypes = /jpeg|jpg|png|webp|pdf/;
     const extname = allowedTypes.test(path.extname(file.originalname).toLowerCase());
     const mimetype = allowedTypes.test(file.mimetype);
 

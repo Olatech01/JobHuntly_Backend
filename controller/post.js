@@ -31,7 +31,6 @@ const createJob = async (req, res) => {
             categories,
             skills,
             capacity,
-            // deadline,
             jobDescriptions,
             responsibilities,
             whoYouAre,

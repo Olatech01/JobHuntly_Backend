@@ -10,21 +10,31 @@ const applicationSchema = new Schema({
 
     job: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: "Job"
+        ref: "jobPosts"
     },
 
     fullName: String,
     email: String,
     phone: String,
 
-    resume: String,
-
+    resume: {
+        type:String,
+        default: ""
+    },
     coverLetter: String,
 
     portfolio: String,
+    jobTitle: String,
 
     status: {
         type: String,
+        enum: [
+            "pending",
+            "reviewed",
+            "shortlisted",
+            "rejected",
+            "hired"
+        ],
         default: "pending"
     }
 
