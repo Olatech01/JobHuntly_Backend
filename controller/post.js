@@ -116,7 +116,7 @@ const getJobById = async (req, res) => {
         const job = await JobPost.findById(jobId)
             .populate({
                 path: 'company',
-                select: 'companyLogo companyName website location',
+                select: 'companyLogo companyName website location industry',
             })
             .exec();
 
