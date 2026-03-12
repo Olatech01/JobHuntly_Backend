@@ -14,6 +14,9 @@ const companySchema = new Schema({
         type: String,
         default: ""
     },
+    companyLogoPublicId: {
+        type: String, 
+    },
     website: String,
     industry: String,
     companySize: String,

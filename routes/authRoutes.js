@@ -2,7 +2,7 @@ const express = require("express");
 const { register, login, changePassword } = require("../controller/auth");
 const { auth, companyAuth } = require("../middleWare/auth");
 const { getProfile, updateProfile, updateCompanyProfile, getCompanyProfile } = require("../controller/userProfile");
-const upload = require("../config/multerConfig");
+const { upload } = require("../config/multerConfig");
 // const auth = require("../middleWare/auth")
 
 
