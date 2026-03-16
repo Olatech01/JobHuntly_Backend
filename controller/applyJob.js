@@ -53,4 +53,72 @@ const applyJob = async (req, res) => {
   }
 };
 
-module.exports = { applyJob };
+
+
+const getApplicantsForJob = async (req, res) => {
+  try {
+
+    const jobId = req.params.id;
+
+    const job = await JobPost.findById(jobId);
+
+    if (!job) {
+      return res.status(404).json({
+        message: "Job not found"
+      });
+    }
+
+    const applications = await Application.find({ job: jobId })
+      .populate("user", "username email")
+      .sort({ createdAt: -1 });
+
+    res.status(200).json({
+      totalApplicants: applications.length,
+      applicants: applications
+    });
+
+  } catch (error) {
+    res.status(500).json({
+      error: error.message
+    });
+  }
+};
+
+
+const withdrawApplication = async (req, res) => {
+  try {
+
+    const jobId = req.params.id;
+
+    const application = await Application.findOne({
+      job: jobId,
+      user: req.user._id
+    });
+
+    if (!application) {
+      return res.status(404).json({
+        message: "Application not found"
+      });
+    }
+
+    await application.deleteOne();
+
+    await JobPost.findByIdAndUpdate(jobId, {
+      $inc: { applicationsCount: -1 }
+    });
+
+    res.status(200).json({
+      message: "Application withdrawn successfully"
+    });
+
+  } catch (error) {
+    res.status(500).json({
+      error: error.message
+    });
+  }
+};
+
+
+
+
+module.exports = { applyJob, withdrawApplication, getApplicantsForJob };

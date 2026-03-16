@@ -53,11 +53,19 @@ const jobPost = new Schema({
     },
     company: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: "Company",         
-        required: true           
+        ref: "Company",
+        required: true
     },
     location: String,
     experienceLevel: String,
+    status: {
+        type: String,
+        enum: [
+            "Open",
+            "Closed"
+        ],
+        default: "Open"
+    },
     remote: Boolean,
 
     applicationsCount: {

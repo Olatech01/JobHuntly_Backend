@@ -77,6 +77,76 @@ const createJob = async (req, res) => {
 };
 
 
+const updateJobStatus = async (req, res) => {
+    try {
+        const user = req.user;
+
+        if (!user) {
+            return res.status(401).json({
+                message: "Not authenticated"
+            });
+        }
+
+        if (user.userType !== "company") {
+            return res.status(403).json({
+                message: "Only companies can update job status"
+            });
+        }
+
+        const { id } = req.params;
+        const { status } = req.body;
+
+        if (!status) {
+            return res.status(400).json({
+                message: "Status is required"
+            });
+        }
+
+        if (!["Open", "Closed"].includes(status)) {
+            return res.status(400).json({
+                message: "Invalid status value"
+            });
+        }
+
+        const company = await Company.findOne({ user: user._id });
+
+        if (!company) {
+            return res.status(404).json({
+                message: "Company profile not found"
+            });
+        }
+
+        const job = await JobPost.findOne({
+            _id: id,
+            company: company._id
+        });
+
+        if (job.deadline && job.deadline < new Date()) {
+            job.status = "Closed";
+        }
+
+        if (!job) {
+            return res.status(404).json({
+                message: "Job not found or not owned by your company"
+            });
+        }
+
+        job.status = status;
+        await job.save();
+
+        res.status(200).json({
+            message: "Job status updated successfully",
+            data: job
+        });
+
+    } catch (error) {
+        res.status(500).json({
+            message: error.message
+        });
+    }
+};
+
+
 
 const allJobs = async (req, res) => {
     try {
@@ -139,4 +209,4 @@ const jobsByCompany = async (req, res) => {
 }
 
 
-module.exports = { createJob, allJobs, getJobById };
+module.exports = { createJob, allJobs, getJobById, updateJobStatus };
