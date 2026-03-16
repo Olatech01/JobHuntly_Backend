@@ -205,8 +205,44 @@ const getJobById = async (req, res) => {
 
 
 const jobsByCompany = async (req, res) => {
+    try {
+        const user = req.user;
+
+        if (!user) {
+            return res.status(401).json({
+                message: "Not authenticated"
+            });
+        }
+
+        if (user.userType !== "company") {
+            return res.status(403).json({
+                message: "Only company accounts can view team members"
+            });
+        }
+
+        const companyDoc = await Company.findOne({ user: user._id });
+
+        if (!companyDoc) {
+            return res.status(404).json({
+                message: "Company profile not found"
+            });
+        }
+
+        const jobs = await JobPost.find({
+            company: companyDoc._id
+        }).sort({ createdAt: -1 })
+
+        res.status(200).json({
+            totalJobs: jobs.length,
+            data: jobs
+        })
+    } catch (error) {
+        res.status(500).json({
+            message: error.message
+        });
+    }
 
 }
 
 
-module.exports = { createJob, allJobs, getJobById, updateJobStatus };
+module.exports = { createJob, allJobs, getJobById, updateJobStatus, jobsByCompany };
