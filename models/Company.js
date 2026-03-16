@@ -20,7 +20,12 @@ const companySchema = new Schema({
     industry: [String],
     companySize: String,
     location: String,
-    description: String
+    description: String,
+    contact: [String],
+    companyGallery: {
+        type: [String],
+        default: ""
+    }
 })
 
 

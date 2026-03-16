@@ -99,7 +99,8 @@ const updateCompanyProfile = async (req, res) => {
             industry,
             companySize,
             location,
-            description
+            description,
+            contact,
         } = req.body;
 
         let companyLogo;
@@ -121,6 +122,7 @@ const updateCompanyProfile = async (req, res) => {
             companyLogo,
             companyLogoPublicId,
             description,
+            contact
         };
 
         // Remove undefined fields
