@@ -33,7 +33,8 @@ const applicationSchema = new Schema({
             "reviewed",
             "shortlisted",
             "rejected",
-            "hired"
+            "hired",
+            "interviewing"
         ],
         default: "pending"
     }
