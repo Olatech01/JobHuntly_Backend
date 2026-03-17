@@ -1,6 +1,6 @@
 const express = require("express");
 const { auth, companyAuth } = require("../middleWare/auth");
-const { getAllCompany } = require("../controller/company");
+const { getAllCompany, addStack, allStacks } = require("../controller/company");
 const { addTeam, allteamByCompany } = require("../controller/team");
 const { upload } = require("../config/multerConfig");
 
@@ -24,6 +24,8 @@ router.post(
 
 
 router.get("/company/team", auth, companyAuth, allteamByCompany);
+router.post("/addStack", auth, companyAuth, upload.single("stackImage"), addStack);
+router.get("/stack", auth, companyAuth, allStacks)
 
 
 
