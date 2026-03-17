@@ -11,6 +11,7 @@ const profileSchema = new Schema({
     fullName: String,
     email: String,
     phone: String,
+    aboutMe: String,
     location: String,
     skills: [String],
     resume: String,

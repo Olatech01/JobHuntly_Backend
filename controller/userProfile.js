@@ -180,6 +180,7 @@ const updateProfile = async (req, res) => {
             phone,
             location,
             skills,
+            aboutMe,
             resume,
             experienceLevel
         } = req.body;
@@ -199,6 +200,7 @@ const updateProfile = async (req, res) => {
             location,
             skills,
             resume,
+            aboutMe,
             experienceLevel,
             profilePicture,
             profilePicturePublicId
