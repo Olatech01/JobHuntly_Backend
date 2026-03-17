@@ -53,6 +53,39 @@ const applyJob = async (req, res) => {
   }
 };
 
+const totalApplicationByUser = async (req, res) => {
+  try {
+    const userId = req.user._id;
+
+    const applications = await Application.find({ user: userId })
+      // .populate({
+      //   path: "job",
+      //   select: "jobTitle employmentType salary deadline companyName"
+      // })
+      .populate({
+        path: "job",
+        select: "jobTitle employmentType salary deadline",
+        populate: {
+          path: "company",
+          select: "companyName companyLogo"
+        }
+      })
+      .sort({ createdAt: -1 });
+
+    const totalApplications = applications.length;
+
+    res.status(200).json({
+      totalApplications,
+      applications
+    });
+
+  } catch (error) {
+    res.status(500).json({
+      error: error.message
+    });
+  }
+};
+
 
 
 const getApplicantsForJob = async (req, res) => {
@@ -83,6 +116,9 @@ const getApplicantsForJob = async (req, res) => {
     });
   }
 };
+
+
+
 
 
 const withdrawApplication = async (req, res) => {
@@ -121,4 +157,4 @@ const withdrawApplication = async (req, res) => {
 
 
 
-module.exports = { applyJob, withdrawApplication, getApplicantsForJob };
+module.exports = { applyJob, withdrawApplication, getApplicantsForJob, totalApplicationByUser };

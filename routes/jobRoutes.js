@@ -1,7 +1,7 @@
 const express = require("express");
 const { createJob, allJobs, getJobById, updateJobStatus, jobsByCompany } = require("../controller/post");
 const { auth, companyAuth } = require("../middleWare/auth");
-const { applyJob, getApplicantsForJob, withdrawApplication } = require("../controller/applyJob");
+const { applyJob, getApplicantsForJob, withdrawApplication, totalApplicationByUser } = require("../controller/applyJob");
 const { upload } = require("../config/multerConfig");
 // const auth = require("../middleWare/auth")
 
@@ -22,6 +22,7 @@ router.post("/applyJob/:id",
     applyJob
 )
 router.get("/job/:id/applicants", auth, companyAuth, getApplicantsForJob);
+router.get("/user/applications", auth, totalApplicationByUser);
 
 router.delete("/withdraw/:id", auth, withdrawApplication);
 
