@@ -185,9 +185,11 @@ const updateProfile = async (req, res) => {
         } = req.body;
 
         let profilePicture;
+        let profilePicturePublicId;
 
         if (req.file) {
-            profilePicture = `/uploads/${req.file.filename}`;
+            profilePicture = req.file.path;
+            profilePicturePublicId = req.file.filename;
         }
 
         const allowedFields = {
@@ -198,7 +200,8 @@ const updateProfile = async (req, res) => {
             skills,
             resume,
             experienceLevel,
-            profilePicture
+            profilePicture,
+            profilePicturePublicId
         };
 
         Object.keys(allowedFields).forEach(
@@ -219,7 +222,9 @@ const updateProfile = async (req, res) => {
             });
 
         } else {
-
+            if (req.file && profile.profilePicturePublicId) {
+                await cloudinary.uploader.destroy(profile.profilePicturePublicId);
+            }
             profile = await UserProfile.findOneAndUpdate(
                 { user: userId },
                 { $set: allowedFields },

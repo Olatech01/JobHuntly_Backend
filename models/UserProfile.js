@@ -18,6 +18,9 @@ const profileSchema = new Schema({
         type: String,
         default: ""
     },
+    profilePicturePublicId: {
+        type: String,
+    },
     experienceLevel: {
         type: String,
         enum: ['entry', 'mid', 'senior', 'executive'],
