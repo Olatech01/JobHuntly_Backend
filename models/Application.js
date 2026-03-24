@@ -13,6 +13,16 @@ const applicationSchema = new Schema({
         ref: "jobPosts"
     },
 
+    applicant: {
+        type: Schema.Types.ObjectId,
+        ref: "User",
+        required: true
+    },
+    company: {
+        type: Schema.Types.ObjectId,
+        ref: "Company",
+        required: true
+    },
     fullName: String,
     email: String,
     phone: String,

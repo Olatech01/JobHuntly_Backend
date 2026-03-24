@@ -3,6 +3,7 @@ const { auth, companyAuth } = require("../middleWare/auth");
 const { getAllCompany, addStack, allStacks } = require("../controller/company");
 const { addTeam, allteamByCompany } = require("../controller/team");
 const { upload } = require("../config/multerConfig");
+const { getCompanyApplications } = require("../controller/applyJob");
 
 
 
@@ -26,6 +27,8 @@ router.post(
 router.get("/company/team", auth, companyAuth, allteamByCompany);
 router.post("/addStack", auth, companyAuth, upload.single("stackImage"), addStack);
 router.get("/stack", auth, companyAuth, allStacks)
+router.get("/allCompanyApplicants", auth, companyAuth, getCompanyApplications)
+
 
 
 

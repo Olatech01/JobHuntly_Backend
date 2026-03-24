@@ -1,4 +1,5 @@
 const Application = require("../models/Application");
+const Company = require("../models/Company");
 const JobPost = require("../models/JobPost");
 const UserProfile = require("../models/UserProfile");
 
@@ -6,29 +7,50 @@ const applyJob = async (req, res) => {
   try {
     const jobId = req.params.id;
 
-    const existing = await Application.findOne({ user: req.user._id, job: jobId });
+    const existing = await Application.findOne({
+      applicant: req.user._id,   // ✅ fixed
+      job: jobId
+    });
+
     if (existing) {
-      return res.status(400).json({ message: "You have already applied for this job" });
+      return res.status(400).json({
+        message: "You have already applied for this job"
+      });
     }
 
-    const userProfile = await UserProfile.findOne({ user: req.user._id });
+    const userProfile = await UserProfile.findOne({
+      user: req.user._id
+    });
+
     if (!userProfile) {
-      return res.status(404).json({ message: "User profile not found" });
+      return res.status(404).json({
+        message: "User profile not found"
+      });
     }
 
-    // Get resume from uploaded file or fallback to profile resume
+    const job = await JobPost.findById(jobId);
+
+    if (!job) {
+      return res.status(404).json({
+        message: "Job not found"
+      });
+    }
+
     let resume = userProfile.resume;
     if (req.file) {
-      resume = req.file.path; // Cloudinary URL of uploaded PDF
+      resume = req.file.path;
     }
 
     if (!resume) {
-      return res.status(400).json({ message: "Resume is required. Please upload a PDF or add one to your profile." });
+      return res.status(400).json({
+        message: "Resume is required"
+      });
     }
 
     const application = await Application.create({
-      user: req.user._id,
+      applicant: req.user._id,   // ✅ FIXED
       job: jobId,
+      company: job.company,
       fullName: userProfile.fullName,
       email: userProfile.email,
       phone: userProfile.phone,
@@ -37,7 +59,6 @@ const applyJob = async (req, res) => {
       portfolio: req.body.portfolio,
       jobTitle: req.body.jobTitle,
     });
-
 
     await JobPost.findByIdAndUpdate(jobId, {
       $inc: { applicationsCount: 1 }
@@ -155,6 +176,37 @@ const withdrawApplication = async (req, res) => {
 };
 
 
+const getCompanyApplications = async (req, res) => {
+  try {
+
+    const company = await Company.findOne({
+      user: req.user._id
+    });
+
+    if (!company) {
+      return res.status(404).json({
+        message: "Company profile not found"
+      });
+    }
+
+    const applications = await Application
+      .find({ company: company._id })   // ✅ FIX HERE
+      .populate("job")
+      .populate("user");
+
+    res.status(200).json({
+      message: "Application retrieved successfully",
+      applications
+    });
+
+  } catch (error) {
+    res.status(500).json({
+      error: error.message
+    });
+  }
+};
 
 
-module.exports = { applyJob, withdrawApplication, getApplicantsForJob, totalApplicationByUser };
+
+
+module.exports = { applyJob, withdrawApplication, getApplicantsForJob, totalApplicationByUser, getCompanyApplications };
